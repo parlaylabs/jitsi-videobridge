@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jitsi:zrtp4j-light:3.2.0-jitsi-1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/zrtp4j-light/3.2.0-jitsi-1-SNAPSHOT/zrtp4j-light-3.2.0-jitsi-1-20150723.002345-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/zrtp4j-light/3.2.0-jitsi-1-SNAPSHOT/zrtp4j-light-3.2.0-jitsi-1-20150723.002345-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/zrtp4j-light/3.2.0-jitsi-1-SNAPSHOT/zrtp4j-light-3.2.0-jitsi-1-20150723.002345-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -18,7 +18,7 @@
   <url>https://github.com/jitsi/jitsi-videobridge</url>
 
   <properties>
-    <assembly.skipAssembly>true</assembly.skipAssembly>
+    <assembly.skipAssembly>false</assembly.skipAssembly>
     <exec.mainClass>org.jitsi.videobridge.Main</exec.mainClass>
   </properties>
 
@@ -196,6 +196,33 @@
       <version>3.4</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.json</groupId>
+      <artifactId>javax.json-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>javax.json</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <version>1.6.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-easymock</artifactId>
+        <version>1.6.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>0.8.2.2</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -234,9 +261,12 @@
               <descriptor>src/assembly/linux-x64-bin-archive.xml</descriptor>
               <finalName>${project.artifactId}-linux-x64-${project.version}</finalName>
               <skipAssembly>${assembly.skipAssembly}</skipAssembly>
+              <formats>
+                <format>dir</format>
+	          </formats>
             </configuration>
           </execution>
-          <execution>
+          <!--execution>
             <id>assembly-linux-x86-bin-archive</id>
             <phase>package</phase>
             <goals>
@@ -287,7 +317,7 @@
               <finalName>${project.artifactId}-windows-x86-${project.version}</finalName>
               <skipAssembly>${assembly.skipAssembly}</skipAssembly>
             </configuration>
-          </execution>
+          </execution-->
         </executions>
       </plugin>
       <plugin>
@@ -333,6 +363,30 @@
   </build>
 
   <repositories>
+    <repository>
+      <id>fatline-maven-releases</id>
+      <layout>default</layout>
+      <name>Fatline Maven Releases</name>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <url>http://maven.fatline.io/artifactory/fatline-releases</url>
+    </repository>
+    <repository>
+      <id>fatline-maven-snapshots</id>
+      <layout>default</layout>
+      <name>Fatline Maven Snapshots</name>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <url>http://maven.fatline.io/artifactory/fatline-snapshots</url>
+    </repository>
     <repository>
       <id>jitsi-maven-repository-releases</id>
       <layout>default</layout>

@@ -119,6 +119,12 @@ public class Main
     private static final String SUBDOMAIN_ARG_NAME = "--subdomain";
 
     /**
+     * Environment name jitsi is deployed, if no environment name specified,
+     * kafka logging will be disabled
+     */
+    public static final String ENV_NAME = "ENV_NAME";
+
+    /**
      * Represents the <tt>main</tt> entry point of the Jitsi Videobridge
      * application which implements an external Jabber component.
      *
@@ -126,6 +132,7 @@ public class Main
      * @throws Exception if anything goes wrong and the condition cannot be
      * gracefully handled during the execution of the application
      */
+
     public static void main(String[] args)
         throws Exception
     {

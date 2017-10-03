@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.igniterealtime.smack:smack:3.2.2-jitsi-1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/igniterealtime/smack/smack/3.2.2-jitsi-1-SNAPSHOT/smack-3.2.2-jitsi-1-20151215.185921-3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/igniterealtime/smack/smack/3.2.2-jitsi-1-SNAPSHOT/smack-3.2.2-jitsi-1-20151215.185921-3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/igniterealtime/smack/smack/3.2.2-jitsi-1-SNAPSHOT/smack-3.2.2-jitsi-1-20151215.185921-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

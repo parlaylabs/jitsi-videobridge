@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.opentelecoms.sdp:java-sdp-nist-bridge:1.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/opentelecoms/sdp/java-sdp-nist-bridge/1.1/java-sdp-nist-bridge-1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/opentelecoms/sdp/java-sdp-nist-bridge/1.1/java-sdp-nist-bridge-1.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/opentelecoms/sdp/java-sdp-nist-bridge/1.1/java-sdp-nist-bridge-1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

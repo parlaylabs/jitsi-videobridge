@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jitsi:jitsi-resourcemanager:2.9-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jitsi-resourcemanager/2.9-SNAPSHOT/jitsi-resourcemanager-2.9-20150723.181652-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jitsi-resourcemanager/2.9-SNAPSHOT/jitsi-resourcemanager-2.9-20150723.181652-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jitsi-resourcemanager/2.9-SNAPSHOT/jitsi-resourcemanager-2.9-20150723.181652-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

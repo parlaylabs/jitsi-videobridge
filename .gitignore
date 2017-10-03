@@ -3,11 +3,11 @@
 /junit-reports/
 /.settings/
 /target/
-/openfire/target/
-*.class
 /.classpath
 *.jar
 /.project
 *.swp
-**/.idea/
-*.iml
+docker/libjitsi/libjitsi-1.0-SNAPSHOT.jar
+docker/libjitsi/libjitsi-1.0-SNAPSHOT.pom
+.arcconfig
+.idea/

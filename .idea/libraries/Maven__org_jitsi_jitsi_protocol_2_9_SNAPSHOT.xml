@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jitsi:jitsi-protocol:2.9-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jitsi-protocol/2.9-SNAPSHOT/jitsi-protocol-2.9-20151211.202410-3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jitsi-protocol/2.9-SNAPSHOT/jitsi-protocol-2.9-20151211.202410-3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jitsi-protocol/2.9-SNAPSHOT/jitsi-protocol-2.9-20151211.202410-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

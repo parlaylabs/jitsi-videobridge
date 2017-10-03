@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Some of the below copied from https://github.com/jitsi/jitsi-meet/blob/master/doc/manual-install.md
+mkdir -p ~/.sip-communicator
+cat > ~/.sip-communicator/sip-communicator.properties << _EOF
+org.jitsi.impl.neomedia.transform.srtp.SRTPCryptoContext.checkReplay=false
+org.jitsi.videobridge.rtcp.strategy=org.jitsi.impl.neomedia.rtcp.termination.strategies.BasicRTCPTerminationStrategy
+# This is to have the bridge's REST API run on a different port than fatline's signaling server
+org.jitsi.videobridge.rest.jetty.port=8090
+# This port is intentionally different from the production 5005 because
+# in the unified server world, the classic bridge owns 5005.
+org.jitsi.videobridge.SINGLE_PORT_HARVESTER_PORT=5006
+# This is for highfive stats publisher
+org.jitsi.videobridge.ENABLE_STATISTICS=true
+org.jitsi.videobridge.STATISTICS_INTERVAL.highfive=5000
+org.jitsi.videobridge.STATISTICS_TRANSPORT=highfive
+org.jitsi.videobridge.stats.HighfiveStatsTransport.hfserver= http://telemetry.local.fatline.io:9082
+org.jitsi.videobridge.ENABLE_SIMULCAST_ORDER_COLIBRI_EVENTS=true
+_EOF
+
+JVB_HOME=$(dirname $0)
+cd ${JVB_HOME}
+
+case "$OSTYPE" in
+  darwin*)  OS_DIR="macosx" ;;
+  msys*)    OS_DIR="windows-64" ;;
+  *)        OS_DIR="linux-64" ;;
+esac
+
+mvn clean compile exec:java -Dexec.args="--apis=rest" \
+    -Djava.library.path=${JVB_HOME}/lib/native/${OS_DIR} \
+    -Djava.util.logging.config.file=${JVB_HOME}/lib/local.properties \
+    -Dnet.java.sip.communicator.SC_HOME_DIR_NAME=.sip-communicator

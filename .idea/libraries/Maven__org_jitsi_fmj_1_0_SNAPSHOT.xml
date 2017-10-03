@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jitsi:fmj:1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/fmj/1.0-SNAPSHOT/fmj-1.0-20161207.221530-23.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/fmj/1.0-SNAPSHOT/fmj-1.0-20161207.221530-23-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/fmj/1.0-SNAPSHOT/fmj-1.0-20161207.221530-23-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jitsi:jicoco:1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jicoco/1.0-SNAPSHOT/jicoco-1.0-20161122.205032-37.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jicoco/1.0-SNAPSHOT/jicoco-1.0-20161122.205032-37-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jicoco/1.0-SNAPSHOT/jicoco-1.0-20161122.205032-37-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

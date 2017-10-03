@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jitsi:jain-sip-ri-ossonly:1.2.98c7f8c-jitsi-oss1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jain-sip-ri-ossonly/1.2.98c7f8c-jitsi-oss1/jain-sip-ri-ossonly-1.2.98c7f8c-jitsi-oss1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jain-sip-ri-ossonly/1.2.98c7f8c-jitsi-oss1/jain-sip-ri-ossonly-1.2.98c7f8c-jitsi-oss1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/jain-sip-ri-ossonly/1.2.98c7f8c-jitsi-oss1/jain-sip-ri-ossonly-1.2.98c7f8c-jitsi-oss1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,63 @@
+# This dockerfile is intended to pull down a pre-built, released videobridge version zip
+#  and running it
+#
+# To build:
+# > docker build -t videobridge .
+# Example run:
+# > docker run -d --net=host -e REST_PORT=8086 -e MEDIA_SINGLE_PORT=5007 videobridge
+#
+FROM ubuntu:trusty
+
+MAINTAINER bbaldino <brian@highfive.com>
+
+ENV VIDEOBRIDGE_BUILDNUM="586"
+
+# These variables could be overriden to configure Prosody 
+#ENV VIDEOBRIDGE_SECRET="fUb8iJ5aRk5Urg1Y"
+#ENV XMPP_DOMAIN="example.com"
+#ENV XMPP_SUBDOMAIN="jitsi-videobridge"
+#ENV XMPP_HOST="localhost"
+#ENV XMPP_PORT="5275"
+
+ENV APIS="rest"
+ENV MEDIA_SINGLE_PORT="5005"
+ENV REST_PORT="8081"
+ENV MEDIA_MIN_PORT="10000"
+ENV MEDIA_MAX_PORT="20000"
+
+# Install videobridge and dependencies
+USER root
+RUN apt-get update && apt-get -y install \
+  wget \
+  unzip \
+  default-jre
+# Create videobridge user
+RUN mkdir /jvb && \
+  groupadd -r jvb && \
+  useradd -r -g jvb -d /jvb -s /sbin/nologin -c "Jitsi Videobridge User" jvb && \
+  chown -R jvb:jvb /jvb
+
+# Configure and run
+USER jvb
+
+WORKDIR /jvb
+RUN wget https://download.jitsi.org/jitsi-videobridge/linux/jitsi-videobridge-linux-x64-${VIDEOBRIDGE_BUILDNUM}.zip
+RUN unzip jitsi-videobridge-linux-x64-${VIDEOBRIDGE_BUILDNUM}.zip
+
+RUN mkdir /jvb/.sip-communicator
+RUN echo "org.jitsi.impl.neomedia.transform.srtp.SRTPCryptoContext.checkReplay=false" > /jvb/.sip-communicator/sip-communicator.properties
+
+WORKDIR /jvb/jitsi-videobridge-linux-x64-${VIDEOBRIDGE_BUILDNUM}
+RUN echo "#!/bin/bash" > run.sh
+
+# We want to be able to pass these in at container-run-time, not container-build-time.  So echo these lines into the run script
+#  just before we run it
+# NOTE: we escape the environment variables here so the run.sh script evaluates them at runtime, otherwise they'll be set as the default set in
+#  this file
+RUN echo "echo \"org.jitsi.videobridge.SINGLE_PORT_HARVESTER_PORT=\$MEDIA_SINGLE_PORT\" >> /jvb/.sip-communicator/sip-communicator.properties" >> run.sh
+RUN echo "echo \"org.jitsi.videobridge.rest.jetty.port=\$REST_PORT\" >> /jvb/.sip-communicator/sip-communicator.properties" >> run.sh
+
+RUN echo "./jvb.sh --apis=$APIS" >> run.sh
+RUN chmod +x ./run.sh
+
+CMD ./run.sh

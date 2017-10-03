@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jitsi:newrelic-api-stub:3.21.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/newrelic-api-stub/3.21.0-SNAPSHOT/newrelic-api-stub-3.21.0-20151103.220245-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/newrelic-api-stub/3.21.0-SNAPSHOT/newrelic-api-stub-3.21.0-20151103.220245-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jitsi/newrelic-api-stub/3.21.0-SNAPSHOT/newrelic-api-stub-3.21.0-20151103.220245-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

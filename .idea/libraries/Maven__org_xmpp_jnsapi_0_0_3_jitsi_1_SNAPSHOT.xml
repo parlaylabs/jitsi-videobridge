@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.xmpp:jnsapi:0.0.3-jitsi-1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/xmpp/jnsapi/0.0.3-jitsi-1-SNAPSHOT/jnsapi-0.0.3-jitsi-1-20151013.145326-2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/xmpp/jnsapi/0.0.3-jitsi-1-SNAPSHOT/jnsapi-0.0.3-jitsi-1-20151013.145326-2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/xmpp/jnsapi/0.0.3-jitsi-1-SNAPSHOT/jnsapi-0.0.3-jitsi-1-20151013.145326-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

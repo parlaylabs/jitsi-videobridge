@@ -564,7 +564,13 @@ public class Endpoint
      */
     public void expire()
     {
+        logger.info("Endpoint " + getID() + " expiring");
         this.expired = true;
+        Conference conference = getConference();
+        JSONObject endpointExpirationEvent = new JSONObject();
+        endpointExpirationEvent.put("type", "expiration");
+        endpointExpirationEvent.put("endpoint_id", getID());
+        conference.addPushEvent(endpointExpirationEvent);
     }
 
     /**

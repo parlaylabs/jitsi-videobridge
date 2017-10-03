@@ -112,6 +112,34 @@ public class RESTBundleActivator
      * {@inheritDoc}
      */
     @Override
+    protected Handler initializeHandler(
+            BundleContext bundleContext,
+            Server server)
+        throws Exception
+    {
+        // The main content served by Server. It may include, for example, the
+        // /colibri target of the REST API, purely static content, and
+        // ProxyServlet.
+        Handler handler = super.initializeHandler(bundleContext, server);
+
+        // When handling requests, the main content may be superseded by
+        // RewriteHandler.
+        HandlerWrapper rewriteHandler
+            = initializeRewriteHandler(bundleContext, server);
+
+        if (rewriteHandler != null)
+        {
+            rewriteHandler.setHandler(handler);
+            handler = rewriteHandler;
+        }
+
+        return handler;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Handler initializeHandlerList(
             BundleContext bundleContext,
             Server server)
@@ -126,7 +154,265 @@ public class RESTBundleActivator
         if (colibriHandler != null)
             handlers.add(colibriHandler);
 
+        // Purely static content.
+        Handler resourceHandler
+            = initializeResourceHandler(bundleContext, server);
+
+        if (resourceHandler != null)
+            handlers.add(resourceHandler);
+
+        Handler aliasHandler
+            = initializeResourceHandlerAliases(bundleContext, server);
+
+        if (aliasHandler != null)
+            handlers.add(aliasHandler);
+
+        // ServletHandler to serve, for example, ProxyServlet.
+
+        // XXX ServletContextHandler and/or ServletHandler are not cool because
+        // they always mark HTTP Request as handled if it reaches a Servlet
+        // regardless of whether the Servlet actually did anything.
+        // Consequently, it is advisable to keep Servlets as the last Handler.
+        Handler servletHandler
+            = initializeServletHandler(bundleContext, server);
+
+        if (servletHandler != null)
+            handlers.add(servletHandler);
+
         return initializeHandlerList(handlers);
+    }
+
+    /**
+     * Initializes a new {@code ServletHolder} instance which is to support
+     * long polling with asynchronous HTTP request handling and adds it to a
+     * specific {@code ServletContextHandler}.
+     *
+     * @param servletContextHandler the {@code ServletContextHandler} to add the
+     * new instance to
+     * @return a new {@code ServletHolder} instance which implements support for
+     * long polling with asynchronous HTTP request handling and has been added
+     * to {@code servletContextHandler}
+     */
+    private ServletHolder initializeLongPollingServlet(
+            BundleContext bundleContext,
+            ServletContextHandler servletContextHandler)
+    {
+        ServletHolder holder = new ServletHolder();
+
+        holder.setServlet(new LongPollingServlet(bundleContext));
+
+        // The rules for mappings of the Servlet specification do not allow path
+        // matching in the middle of the path.
+        servletContextHandler.addServlet(
+                holder,
+                HandlerImpl.COLIBRI_TARGET + "*");
+
+        return holder;
+    }
+
+    /**
+     * Initializes a new {@code ServletHolder} instance which is implement
+     * {@code /http-bind} and adds it to a specific
+     * {@code ServletContextHandler}.
+     *
+     * @param servletContextHandler the {@code ServletContextHandler} to add the
+     * new instance to
+     * @return a new {@code ServletHolder} instance which implements
+     * {@code /http-bind} and has been added to {@code servletContextHandler}
+     */
+    private ServletHolder initializeProxyServlet(
+            ServletContextHandler servletContextHandler)
+    {
+        String pathSpec
+            = getCfgString(JETTY_PROXY_SERVLET_PATH_SPEC_PNAME, null);
+        ServletHolder holder = null;
+
+        if (pathSpec != null && pathSpec.length() != 0)
+        {
+            String proxyTo
+                = getCfgString(JETTY_PROXY_SERVLET_PROXY_TO_PNAME, null);
+
+            if (proxyTo != null && proxyTo.length() != 0)
+            {
+                holder = new ServletHolder();
+                holder.setHeldClass(ProxyServletImpl.class);
+                // XXX ProxyServlet will throw an IllegalStateException without
+                // maxThreads. The documentation on ProxyServlet says the
+                // default value is 256.
+                holder.setInitParameter("maxThreads", Integer.toString(256));
+                holder.setInitParameter("prefix", pathSpec);
+                holder.setInitParameter("proxyTo", proxyTo);
+
+                // hostHeader
+                String hostHeader
+                    = getCfgString(JETTY_PROXY_SERVLET_HOST_HEADER_PNAME, null);
+
+                if (hostHeader != null && hostHeader.length() != 0)
+                    holder.setInitParameter("hostHeader", hostHeader);
+
+                servletContextHandler.addServlet(holder, pathSpec);
+            }
+        }
+        return holder;
+    }
+
+    /**
+     * Initializes a new {@link Handler} instance which is to serve purely
+     * static content for a specific {@code Server} instance.
+     *
+     * @param bundleContext the {@code BundleContext} in which the new instance
+     * is to be initialized
+     * @param server the {@code Server} for which the new instance is to serve
+     * purely static content
+     * @return a new {@code Handler} instance which is to serve purely static
+     * content for {@code server}
+     */
+    private Handler initializeResourceHandler(
+            BundleContext bundleContext,
+            Server server)
+    {
+        String resourceBase
+            = getCfgString(JETTY_RESOURCE_HANDLER_RESOURCE_BASE_PNAME, null);
+        ContextHandler contextHandler;
+
+        if (resourceBase == null || resourceBase.length() == 0)
+        {
+            contextHandler = null;
+        }
+        else
+        {
+            ResourceHandler resourceHandler = new SSIResourceHandler(cfg);
+
+            resourceHandler.setResourceBase(resourceBase);
+
+            // Enable alisases so we can handle symlinks.
+            contextHandler = new ContextHandler();
+            contextHandler.setHandler(resourceHandler);
+            contextHandler.addAliasCheck(new ContextHandler.ApproveAliases());
+        }
+
+        return contextHandler;
+    }
+
+    /**
+     * Initializes a new {@link Handler} instance which is to serve purely
+     * static content for a specific {@code Server} instance and only the
+     * aliases configured.
+     *
+     * @param bundleContext the {@code BundleContext} in which the new instance
+     * is to be initialized
+     * @param server the {@code Server} for which the new instance is to serve
+     * purely static content
+     * @return a new {@code Handler} instance which is to serve purely static
+     * content for {@code server}
+     */
+    private Handler initializeResourceHandlerAliases(
+            BundleContext bundleContext,
+            Server server)
+    {
+        return
+            new ResourceHandler()
+            {
+                /**
+                 * Checks whether there is configured alias/link for the path
+                 * and, if there is, uses the configured value as resource to
+                 * return.
+                 *
+                 * @param path the path to check
+                 * @return the resource to server.
+                 * @throws MalformedURLException
+                 */
+                @Override
+                public Resource getResource(String path)
+                    throws MalformedURLException
+                {
+                    String value
+                        = getCfgString(
+                                JETTY_RESOURCE_HANDLER_ALIAS_PREFIX + "."
+                                    + path,
+                                null);
+
+                    return (value == null) ? null : Resource.newResource(value);
+                }
+            };
+    }
+
+    /**
+     * Initializes a new {@link HandlerWrapper} instance which is to match
+     * requests against a set of rules and modify them accordingly for any rules
+     * that match.
+     *
+     * @param bundleContext the {@code BundleContext} in which the new instance
+     * is to be initialized
+     * @param server the {@code Server} for which the new instance is to match
+     * requests against a set of rules and modify them accordingly for any rules
+     * that match
+     * @return a new {@code HandlerWrapper} instance which is to match requests
+     * against a set of rules and modify them accordingly for any rules that
+     * match
+     */
+    private HandlerWrapper initializeRewriteHandler(
+            BundleContext bundleContext,
+            Server server)
+    {
+        String regex = getCfgString(JETTY_REWRITE_HANDLER_REGEX_PNAME, null);
+        RewriteHandler handler = null;
+
+        if (regex != null && regex.length() != 0)
+        {
+            String replacement
+                = getCfgString(JETTY_REWRITE_HANDLER_REPLACEMENT_PNAME, null);
+
+            if (replacement != null)
+            {
+                RewriteRegexRule rule = new RewriteRegexRule();
+
+                rule.setRegex(regex);
+                rule.setReplacement(replacement);
+
+                handler = new RewriteHandler();
+                handler.addRule(rule);
+            }
+        }
+        return handler;
+    }
+
+    /**
+     * Initializes a new {@link ServletHandler} instance which is to map
+     * requests to servlets.
+     *
+     * @param bundleContext the {@code BundleContext} in which the new instance
+     * is to be initialized
+     * @param server the {@code Server} for which the new instance is to map
+     * requests to servlets
+     * @return a new {@code ServletHandler} instance which is to map requests to
+     * servlets for {@code server}
+     */
+    private Handler initializeServletHandler(
+            BundleContext bundleContext,
+            Server server)
+    {
+        ServletHolder servletHolder;
+        ServletContextHandler servletContextHandler
+            = new ServletContextHandler();
+        boolean b = false;
+
+        // ProxyServletImpl i.e. http-bind.
+        servletHolder = initializeProxyServlet(servletContextHandler);
+        if (servletHolder != null)
+            b = true;
+
+        // LongPollingServlet
+        servletHolder = initializeLongPollingServlet(bundleContext, servletContextHandler);
+        if (servletHolder != null)
+            b = true;
+
+        if (b)
+            servletContextHandler.setContextPath("/");
+        else
+            servletContextHandler = null;
+
+        return servletContextHandler;
     }
 
     /**

@@ -22,6 +22,7 @@ import java.text.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.logging.*;
+import java.util.concurrent.*;
 
 import net.java.sip.communicator.impl.protocol.jabber.extensions.colibri.*;
 import net.java.sip.communicator.impl.protocol.jabber.extensions.colibri.ColibriConferenceIQ.Recording.*;
@@ -192,6 +193,21 @@ public class Conference
      */
     private final Map<String, IceUdpTransportManager> transportManagers
         = new HashMap<>();
+
+    public interface PushEventListener {
+        boolean handleEvent(JSONObject event);
+    }
+
+    private final List<PushEventListener> pushEventListeners = new ArrayList<>();
+
+
+    /**
+     * Queue to which any push events are added.  These events will be pulled by another
+     *  object who will send them out.
+     * NOTE: this sucks.  this should use whatever mechanism is used to push events out
+     *  the xmpp channel.
+     */
+    private final BlockingDeque<JSONObject> pushEventQueue = new LinkedBlockingDeque<>();
 
     /**
      * The <tt>Videobridge</tt> which has initialized this <tt>Conference</tt>.
@@ -1923,6 +1939,75 @@ public class Conference
     public Logger getLogger()
     {
         return logger;
+    }
+
+    public void addPushEventListener(PushEventListener listener)
+    {
+        synchronized (pushEventListeners)
+        {
+            pushEventListeners.add(listener);
+            if (!pushEventQueue.isEmpty() && pushEventListeners.size() == 1)
+            {
+                notifyPushEventListeners();
+            }
+        }
+    }
+
+    public void removePushEventListener(PushEventListener listener)
+    {
+        synchronized (pushEventListeners)
+        {
+            pushEventListeners.remove(listener);
+        }
+    }
+
+    private void notifyPushEventListeners()
+    {
+        JSONObject event = pushEventQueue.poll();
+        while (event != null)
+        {
+            List<PushEventListener> listeners = new ArrayList<>();
+            synchronized (pushEventListeners)
+            {
+                listeners.addAll(pushEventListeners);
+            }
+
+            if (listeners.isEmpty())
+            {
+                // add event back to head of the queue
+                pushEventQueue.offerFirst(event);
+                return;
+            }
+
+            boolean isEventHandled = false;
+            for (PushEventListener listener : listeners)
+            {
+                // listeners are only allowed to process one event
+                removePushEventListener(listener);
+                if (listener.handleEvent(event))
+                {
+                    isEventHandled = true;
+                }
+            }
+
+            if (isEventHandled)
+            {
+                event = pushEventQueue.poll();
+            }
+        }
+    }
+
+    public void addPushEvent(JSONObject event)
+    {
+      logger.info("Conference " + getID() + " adding a push event for signaling");
+      try {
+          pushEventQueue.put(event);
+          notifyPushEventListeners();
+      }
+      catch (InterruptedException e)
+      {
+        logger.error("Conference " + getID() + " failed to add push event to queue: " + event.toString());
+      }
     }
 
     /**

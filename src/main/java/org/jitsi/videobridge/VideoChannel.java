@@ -464,10 +464,12 @@ public class VideoChannel
         RawPacket pkt,
         RtpChannel source)
     {
-        if (!data)
+        if (!data || source == null)
         {
             return true;
         }
+        // XXX(gp) we could potentially move this into a TransformEngine.
+        boolean accept = lastNController.isForwarded(source);
 
         boolean accept = bitrateController.accept(pkt);
 

@@ -77,6 +77,14 @@ public abstract class Channel
     public static final String ENDPOINT_PROPERTY_NAME = ".endpoint";
 
     /**
+     * The name of the <tt>Channel</tt> property <tt>lastN</tt> which
+     * points to the <tt>lastN</tt> of the conference participant associated
+     * with this <tt>Channel</tt>..
+     */
+    public static final String LASTN_PROPERTY_NAME = ".lastn";
+
+
+    /**
      * The <tt>Content</tt> which has initialized this <tt>Channel</tt>.
      */
     private final Content content;
@@ -436,9 +444,12 @@ public abstract class Channel
 
             if (logger.isInfoEnabled())
             {
-
-                logger.info(Logger.Category.STATISTICS,
-                            "expire_ch," + getLoggingId());
+                logger.info(
+                        "Expired channel " + getID() + " of content "
+                            + content.getName() + " of endpoint "
+                            + (getEndpoint() != null ? getEndpoint().getID() : "null") + " of conference "
+                            + conference.getID() + ". "
+                            + videobridge.getConferenceCountString());
             }
         }
 

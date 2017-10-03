@@ -18,8 +18,11 @@ package org.jitsi.videobridge;
 import org.jitsi.cmd.*;
 import org.jitsi.meet.*;
 import org.jitsi.service.neomedia.*;
+import org.jitsi.videobridge.logging.HighfiveLoggingHandler;
 import org.jitsi.videobridge.osgi.*;
 import org.jitsi.videobridge.xmpp.*;
+
+import java.util.logging.Logger;
 
 /**
  * Provides the <tt>main</tt> entry point of the Jitsi Videobridge application
@@ -39,6 +42,8 @@ import org.jitsi.videobridge.xmpp.*;
  */
 public class Main
 {
+    private static final net.java.sip.communicator.util.Logger logger
+            = net.java.sip.communicator.util.Logger.getLogger(Main.class);
     /**
      * The name of the command-line argument which specifies the application
      * programming interfaces (APIs) to enable for Jitsi Videobridge.
@@ -139,6 +144,10 @@ public class Main
         CmdLine cmdLine = new CmdLine();
 
         cmdLine.parse(args);
+
+        // FIXME: [FTL-944] load the Logging handler from properties file
+        Logger logger = Logger.getLogger("");
+        logger.addHandler(new HighfiveLoggingHandler());
 
         // Parse the command-line arguments.
         String apis

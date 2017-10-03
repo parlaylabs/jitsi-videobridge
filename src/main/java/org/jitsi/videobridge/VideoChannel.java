@@ -25,8 +25,10 @@ import net.java.sip.communicator.impl.protocol.jabber.extensions.jingle.*;
 
 import org.ice4j.util.*;
 import org.jitsi.impl.neomedia.*;
-import org.jitsi.impl.neomedia.rtp.*;
-import org.jitsi.impl.neomedia.rtp.translator.*;
+import org.jitsi.impl.neomedia.rtcp.*;
+import org.jitsi.impl.neomedia.rtcp.termination.strategies.*;
+import org.jitsi.impl.neomedia.stats.StatisticsTable;
+import org.jitsi.impl.neomedia.transform.*;
 import org.jitsi.service.configuration.*;
 import org.jitsi.service.libjitsi.*;
 import org.jitsi.service.neomedia.*;
@@ -37,6 +39,10 @@ import org.jitsi.util.Logger; // Disambiguation.
 import org.jitsi.util.concurrent.*;
 import org.jitsi.videobridge.cc.*;
 import org.json.simple.*;
+
+import static org.jitsi.impl.neomedia.stats.CounterName.NACKS_RETRANSMIT_CACHE_MISS;
+import static org.jitsi.impl.neomedia.stats.CounterName.NACKS_FORWARDED_TO_SENDER;
+import static org.jitsi.impl.neomedia.stats.CounterName.NACKS_REQUESTS_FROM_RECEIVER;
 
 /**
  * Implements an <tt>RtpChannel</tt> with <tt>MediaType.VIDEO</tt>.
@@ -130,6 +136,7 @@ public class VideoChannel
      */
     private static final Timer delayedFirTimer = new Timer();
 
+    private StatisticsTable stats;
     /**
      * The {@link RecurringRunnableExecutor} instance for {@link VideoChannel}s.
      */
@@ -667,11 +674,11 @@ public class VideoChannel
             {
                 enableRedFilter = false;
             }
-
-            for (RtcpFbPacketExtension rtcpFb :
+	    for (RtcpFbPacketExtension rtcpFb :
                         payloadType.getChildExtensionsOfType(
-                                RtcpFbPacketExtension.class))
-            {
+				RtcpFbPacketExtension.class))
+	    {
+
                 if ("ccm".equals(rtcpFb.getAttribute("type"))
                         && "fir".equals(rtcpFb.getAttribute("subtype")))
                 {
@@ -686,6 +693,79 @@ public class VideoChannel
                 {
                     supportsRemb = true;
                 }
+	    }
+
+        }
+
+        // If the endpoint supports RED we disable the filter (e.g. leave RED).
+        // Otherwise, we strip it.
+        if (transformEngine != null)
+	{
+            transformEngine.enableREDFilter(enableRedFilter);
+	}
+        
+	MediaStream mediaStream = getStream();
+        if (mediaStream != null)
+        {
+            ((VideoMediaStreamImpl) mediaStream).setSupportsFir(supportsFir);
+            ((VideoMediaStreamImpl) mediaStream).setSupportsPli(supportsPli);
+            ((VideoMediaStreamImpl) mediaStream).setSupportsRemb(supportsRemb);
+        }
+    }
+
+    /**
+     * Implements {@link NACKListener#nackReceived(NACKPacket)}.
+     *
+     * Handles an incoming RTCP NACK packet from a receiver.
+     */
+    @Override
+    public void nackReceived(NACKPacket nackPacket)
+    {
+        long ssrc = nackPacket.sourceSSRC;
+        Set<Integer> lostPackets = new TreeSet<>(nackPacket.getLostPackets());
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(
+                    "Received NACK on channel " + getID() +" for SSRC " + ssrc
+                        + ". Packets reported lost: " + lostPackets);
+        }
+
+        RawPacketCache cache;
+        RtxTransformer rtxTransformer;
+
+        if ((cache = getStream().getPacketCache()) != null
+                && (rtxTransformer = transformEngine.getRtxTransformer())
+                        != null)
+        {
+            // XXX The retransmission of packets MUST take into account SSRC
+            // rewriting. Which it may do by injecting retransmitted packets
+            // AFTER the SsrcRewritingEngine. Since the retransmitted packets
+            // have been cached by cache and cache is a TransformEngine, the
+            // injection may as well happen after cache.
+            TransformEngine after
+                = (cache instanceof TransformEngine)
+                    ? (TransformEngine) cache
+                    : null;
+
+            for (Iterator<Integer> i = lostPackets.iterator(); i.hasNext();)
+            {
+                int seq = i.next();
+                RawPacket pkt = cache.get(ssrc, seq);
+
+                if (pkt != null)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(
+                                "Retransmitting packet from cache. SSRC " + ssrc
+                                    + " seq " + seq);
+                    }
+                    if (rtxTransformer.retransmit(pkt, after))
+                    {
+                        i.remove();
+                    }
+                }
             }
         }
 
@@ -693,8 +773,21 @@ public class VideoChannel
         // Otherwise, we strip it.
         if (transformEngine != null)
         {
-            transformEngine.enableREDFilter(enableRedFilter);
+            if (requestRetransmissions)
+            {
+                // If retransmission requests are enabled, videobridge assumes
+                // the responsibility of requesting missing packets.
+                logger.debug("Packets missing from the cache. Ignoring, because"
+                                     + " retransmission requests are enabled.");
+            }
+            else
+            {
+                // Otherwise, if retransmission requests are disabled, we send
+                // a NACK packet of our own.
+                sendNack(nackPacket.senderSSRC, ssrc, lostPackets);
+            }
         }
+    }
 
         MediaStream mediaStream = getStream();
         if (mediaStream != null)

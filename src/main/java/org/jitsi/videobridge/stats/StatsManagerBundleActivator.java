@@ -98,6 +98,11 @@ public class StatsManagerBundleActivator
     private static final String STAT_TRANSPORT_PUBSUB = "pubsub";
 
     /**
+     * The value for callstats.io statistics transport.
+     */
+    private static final String STAT_TRANSPORT_HIGHFIVE = "highfive";
+
+    /**
      * The name of the property which specifies the interval in milliseconds for
      * sending statistics about the Videobridge.
      */
@@ -153,7 +158,11 @@ public class StatsManagerBundleActivator
     {
         StatsTransport t = null;
 
-        if (STAT_TRANSPORT_CALLSTATS_IO.equalsIgnoreCase(transport))
+        if (STAT_TRANSPORT_HIGHFIVE.equalsIgnoreCase(transport))
+        {
+            t = new HighfiveStatsTransport();
+        }
+        else if (STAT_TRANSPORT_CALLSTATS_IO.equalsIgnoreCase(transport))
         {
             t = new CallStatsIOTransport();
         }

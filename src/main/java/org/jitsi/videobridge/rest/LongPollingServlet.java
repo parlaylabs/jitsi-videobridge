@@ -62,8 +62,8 @@ class LongPollingServlet
      */
     @Override
     protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
+        final HttpServletRequest request,
+        final HttpServletResponse response)
         throws IOException,
                ServletException
     {

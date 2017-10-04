@@ -18,7 +18,7 @@
   <url>https://github.com/jitsi/jitsi-videobridge</url>
 
   <properties>
-    <assembly.skipAssembly>false</assembly.skipAssembly>
+    <assembly.skipAssembly>true</assembly.skipAssembly>
     <exec.mainClass>org.jitsi.videobridge.Main</exec.mainClass>
   </properties>
 
@@ -84,7 +84,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ice4j</artifactId>
-      <version>2.0.0-20170821.174042-3</version>
+      <version>2.0.0-20170720.150550-1</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

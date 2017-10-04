@@ -305,7 +305,7 @@ public class Conference
 
         lastKnownFocus = focus;
 
-        speechActivity = new ConferenceSpeechActivity(this);
+        speechActivity = new ConferenceSpeechActivityImpl(this);
         speechActivity.addPropertyChangeListener(propertyChangeListener);
 
         if (enableLogging)
@@ -1362,7 +1362,7 @@ public class Conference
     {
         // If create is false then initiator parameter will not be used.
         // So here it doesnt matter it is true, or false.
-        return getTransportManager(channelBundleId, false, true, false);
+        return getTransportManager(channelBundleId, false, true);
     }
 
     /**

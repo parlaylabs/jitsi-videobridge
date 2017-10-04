@@ -46,7 +46,7 @@ public class PublicRESTBundleActivator
      * this {@link AbstractJettyBundleActivator}.
      */
     public static final String JETTY_PROPERTY_PREFIX
-        = "org.jitsi.videobridge.rest";
+        = "org.jitsi.videobridge.rest.private";
 
     public static final String JETTY_PROXY_SERVLET_HOST_HEADER_PNAME
         = ".jetty.ProxyServlet.hostHeader";

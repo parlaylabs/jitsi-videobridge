@@ -19,15 +19,16 @@ import java.beans.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
 import net.java.sip.communicator.impl.protocol.jabber.extensions.colibri.*;
 import net.java.sip.communicator.impl.protocol.jabber.extensions.jingle.*;
 
 import org.ice4j.util.*;
 import org.jitsi.impl.neomedia.*;
-import org.jitsi.impl.neomedia.rtp.*;
-import org.jitsi.impl.neomedia.rtp.translator.*;
-//import org.jitsi.impl.neomedia.stats.StatisticsTable;
+import org.jitsi.impl.neomedia.rtp.MediaStreamTrackDesc;
+import org.jitsi.impl.neomedia.rtp.MediaStreamTrackReceiver;
+import org.jitsi.impl.neomedia.rtp.RTPEncodingDesc;
+import org.jitsi.impl.neomedia.rtp.translator.RTCPFeedbackMessageSender;
+import org.jitsi.impl.neomedia.rtp.translator.RTPTranslatorImpl;
 import org.jitsi.service.configuration.*;
 import org.jitsi.service.libjitsi.*;
 import org.jitsi.service.neomedia.*;
@@ -468,7 +469,7 @@ public class VideoChannel
             return true;
         }
         // XXX(gp) we could potentially move this into a TransformEngine.
-        boolean accept = lastNController.isForwarded(source);
+//        boolean accept = lastNController.isForwarded(source);
 
         boolean accept = bitrateController.accept(pkt);
 

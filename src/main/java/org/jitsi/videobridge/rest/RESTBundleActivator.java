@@ -70,7 +70,7 @@ public class RESTBundleActivator
      * this {@link AbstractJettyBundleActivator}.
      */
     public static final String JETTY_PROPERTY_PREFIX
-        = "org.jitsi.videobridge.rest.private";
+        = "org.jitsi.videobridge.rest";
 
     /**
      * Initializes a new {@code RESTBundleActivator} instance.

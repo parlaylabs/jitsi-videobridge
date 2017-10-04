@@ -707,6 +707,7 @@ class HandlerImpl
         throws IOException,
                ServletException
     {
+System.out.println("Creating conference");
         Videobridge videobridge = getVideobridge();
 
         if (videobridge == null)
@@ -715,6 +716,7 @@ class HandlerImpl
         }
         else if (RESTUtil.isJSONContentType(request.getContentType()))
         {
+System.out.println("Is Json");
             Object requestJSONObject = null;
             int status = 0;
 
@@ -743,6 +745,7 @@ class HandlerImpl
             }
             if (status == 0)
             {
+System.out.println("Is status 0");
                 ColibriConferenceIQ requestConferenceIQ
                     = JSONDeserializer.deserializeConference(
                             (JSONObject) requestJSONObject);
@@ -754,6 +757,7 @@ class HandlerImpl
                 }
                 else
                 {
+System.out.println("Is valid rciq");
                     ColibriConferenceIQ responseConferenceIQ = null;
 
                     try
@@ -765,6 +769,7 @@ class HandlerImpl
 
                         if (responseIQ instanceof ColibriConferenceIQ)
                         {
+System.out.println("Is valid cciq");
                             responseConferenceIQ
                                 = (ColibriConferenceIQ) responseIQ;
                         }
@@ -785,16 +790,19 @@ class HandlerImpl
                     catch (Exception e)
                     {
                         status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+e.printStackTrace();
                     }
                     if (status == 0 && responseConferenceIQ != null)
                     {
+System.out.println("Is valid json");
                         JSONObject responseJSONObject
                             = JSONSerializer.serializeConference(
                                     responseConferenceIQ);
-
+System.out.println("Is valid json 2");
                         if (responseJSONObject == null)
                             responseJSONObject = new JSONObject();
-
+System.out.println("Is valid json 3");
+System.out.println(responseJSONObject.toJSONString());
                         response.setStatus(HttpServletResponse.SC_OK);
                         responseJSONObject.writeJSONString(
                                 response.getWriter());

@@ -30,10 +30,17 @@
     <orderEntry type="library" name="Maven: xml-apis:xml-apis:1.0.b2" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-rewrite:9.2.10.v20150310" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.2.10.v20150310" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.2.10.v20150310" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.2.10.v20150310" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-client:9.2.10.v20150310" level="project" />
     <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-server:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-common:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-api:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-client:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-servlet:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.2.10.v20150310" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-continuation:9.3.5.v20151012" level="project" />
     <orderEntry type="library" name="Maven: org.fusesource:sigar:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.15" level="project" />
@@ -50,27 +57,24 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:7.0.1.v20091125" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:7.0.1.v20091125" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:fmj:1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.jitsi:ice4j:2.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.jitsi:ice4j:2.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.opentelecoms.sdp:java-sdp-nist-bridge:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.opentelecoms.sdp:sdp-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jain-sip-ri-ossonly:1.2.98c7f8c-jitsi-oss1" level="project" />
     <orderEntry type="library" name="Maven: org.bitlet:weupnp:0.1.4" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jicoco:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-proxy:9.2.10.v20150310" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.2.10.v20150310" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.2.10.v20150310" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.2.10.v20150310" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-android-osgi:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-configuration:2.9-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:15.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:4.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-fileaccess:2.9-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.jitsi:jitsi-lgpl-dependencies:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-netaddr:2.9-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-dnsservice:2.9-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-packetlogging:2.9-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-protocol:2.9-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.jitsi:jitsi-protocol-jabber:2.9-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.jitsi:jitsi-protocol-jabber:2.11-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.xmpp:jnsapi:0.0.3-jitsi-1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.jitsi:jitsi-protocol-media:2.9-SNAPSHOT" level="project" />
@@ -81,7 +85,7 @@
     <orderEntry type="library" name="Maven: org.apache.felix:org.apache.felix.main:4.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.felix:org.apache.felix.framework:4.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.yuvimasory:orange-extensions:1.3.0" level="project" />
-    <orderEntry type="module" module-name="libjitsi" />
+    <orderEntry type="library" name="Maven: org.jitsi:libjitsi:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: ch.imvs:sdes4j:1.1.3" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.6" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.54" level="project" />

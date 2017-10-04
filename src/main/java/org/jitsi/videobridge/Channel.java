@@ -442,6 +442,8 @@ public abstract class Channel
                     throw (ThreadDeath) t;
             }
 
+            Videobridge videobridge = conference.getVideobridge();
+
             if (logger.isInfoEnabled())
             {
                 logger.info(

@@ -24,6 +24,7 @@ import org.jitsi.service.neomedia.*;
 import org.jitsi.util.*;
 import org.jitsi.util.event.*;
 import org.jitsi.videobridge.rest.*;
+import org.json.simple.JSONObject;
 
 /**
  * Represents an endpoint of a participant in a <tt>Conference</tt>.

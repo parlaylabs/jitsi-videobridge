@@ -160,7 +160,7 @@ public class StatsManagerBundleActivator
 
         if (STAT_TRANSPORT_HIGHFIVE.equalsIgnoreCase(transport))
         {
-            t = new HighfiveStatsTransport();
+//            t = new HighfiveStatsTransport();
         }
         else if (STAT_TRANSPORT_CALLSTATS_IO.equalsIgnoreCase(transport))
         {

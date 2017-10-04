@@ -7,6 +7,7 @@ org.jitsi.impl.neomedia.transform.srtp.SRTPCryptoContext.checkReplay=false
 org.jitsi.videobridge.rtcp.strategy=org.jitsi.impl.neomedia.rtcp.termination.strategies.BasicRTCPTerminationStrategy
 # This is to have the bridge's REST API run on a different port than fatline's signaling server
 org.jitsi.videobridge.rest.jetty.port=8090
+org.jitsi.videobridge.rest.private.jetty.port=-1
 # This port is intentionally different from the production 5005 because
 # in the unified server world, the classic bridge owns 5005.
 org.jitsi.videobridge.SINGLE_PORT_HARVESTER_PORT=5006

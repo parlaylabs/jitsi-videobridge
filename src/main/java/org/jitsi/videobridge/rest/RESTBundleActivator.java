@@ -15,12 +15,24 @@
  */
 package org.jitsi.videobridge.rest;
 
+import java.net.MalformedURLException;
 import java.util.*;
 
+import org.eclipse.jetty.rewrite.handler.RewriteHandler;
+import org.eclipse.jetty.rewrite.handler.RewriteRegexRule;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.resource.Resource;
 import org.jitsi.rest.*;
 import org.jitsi.videobridge.*;
+import org.jitsi.videobridge.rest.ssi.SSIResourceHandler;
 import org.osgi.framework.*;
+
+import static org.jitsi.videobridge.rest.PublicRESTBundleActivator.*;
 
 /**
  * Implements <tt>BundleActivator</tt> for the OSGi bundle which implements a

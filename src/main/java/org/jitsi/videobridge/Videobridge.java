@@ -213,7 +213,6 @@ public class Videobridge
      */
     public Videobridge()
     {
-        new VideobridgeExpireThread(this).start();
     }
 
     /**
@@ -1453,6 +1452,8 @@ public class Videobridge
         // it as soon as possible, don't wait to initialize it after an
         // RtpChannel is requested.
         LibJitsi.getMediaService();
+
+        new VideobridgeExpireThread(this).start();
     }
 
     /**

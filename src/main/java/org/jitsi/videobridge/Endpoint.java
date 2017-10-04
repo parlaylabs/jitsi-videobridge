@@ -46,6 +46,13 @@ public class Endpoint
         = Endpoint.class.getName() + ".channels";
 
     /**
+     * The name of the <tt>Endpoint</tt> property <tt>aspectRatio</tt> which specifies
+     * endpoint aspect ratio change.
+     */
+    public static final String STREAM_ASPECT_RATIO_CHANGE_PROPERTY_NAME
+        = Endpoint.class.getName() + " .aspectRatio";
+
+    /**
      * The {@link Logger} used by the {@link Endpoint} class to print debug
      * information.
      */

@@ -207,7 +207,7 @@ class HandlerImpl
     /**
      * The logger instance used by REST handler.
      */
-    private static final Logger logger = Logger.getLogger(HandlerImpl.class);
+    protected static final Logger logger = Logger.getLogger(HandlerImpl.class);
 
     /**
      * The HTTP resource which is used to trigger graceful shutdown.
@@ -537,7 +537,7 @@ class HandlerImpl
      * @throws IOException
      * @throws ServletException
      */
-    private void doPatchConferenceJSON(
+    protected void doPatchConferenceJSON(
             String target,
             Request baseRequest,
             HttpServletRequest request,

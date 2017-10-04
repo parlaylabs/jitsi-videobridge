@@ -17,6 +17,7 @@ package org.jitsi.videobridge;
 
 import java.lang.ref.*;
 
+import org.jitsi.service.configuration.ConfigurationService;
 import org.jitsi.util.*;
 
 /**
@@ -28,6 +29,12 @@ import org.jitsi.util.*;
 class VideobridgeExpireThread
     extends Thread
 {
+    /**
+     * The name of the property which controls the interval used to check
+     * for channel/content/conference expiration
+     */
+    private static final String EXPIRATION_CHECK_INTERVAL_SECONDS
+            = "org.jitsi.videobridge.EXPIRATION_CHECK_INTERVAL_SECONDS";
 
     /**
      * The <tt>Logger</tt> used by the <tt>VideobridgeExpireThread</tt> class
@@ -170,7 +177,23 @@ class VideobridgeExpireThread
     public void run()
     {
         long wakeup = -1;
-        final long sleep = Channel.DEFAULT_EXPIRE * 1000;
+        long expirationCheckIntervalSeconds;
+        {
+            Videobridge videobridge = this.videobridge.get();
+
+            if (videobridge == null)
+            {
+                expirationCheckIntervalSeconds = Channel.DEFAULT_EXPIRE;
+            }
+            else
+            {
+                ConfigurationService cfg = videobridge.getConfigurationService();
+                expirationCheckIntervalSeconds =
+                        cfg == null ? Channel.DEFAULT_EXPIRE : cfg.getLong(EXPIRATION_CHECK_INTERVAL_SECONDS, Channel.DEFAULT_EXPIRE);
+            }
+        }
+        logger.info("Setting expiration check interval to " + expirationCheckIntervalSeconds + " seconds");
+        final long sleep = expirationCheckIntervalSeconds * 1000;
 
         do
         {

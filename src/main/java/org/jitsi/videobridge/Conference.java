@@ -1362,7 +1362,7 @@ public class Conference
     {
         // If create is false then initiator parameter will not be used.
         // So here it doesnt matter it is true, or false.
-        return getTransportManager(channelBundleId, false, true);
+        return getTransportManager(channelBundleId, false, true, false);
     }
 
     /**

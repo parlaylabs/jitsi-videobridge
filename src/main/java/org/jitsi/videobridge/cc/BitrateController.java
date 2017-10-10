@@ -25,6 +25,8 @@ import org.jitsi.service.neomedia.rtp.*;
 import org.jitsi.util.*;
 import org.jitsi.videobridge.*;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -84,7 +86,7 @@ import java.util.concurrent.*;
  * @author George Politis
  */
 public class BitrateController
-    implements TransformEngine
+    implements TransformEngine, PropertyChangeListener
 {
     /**
      * The property name that holds the bandwidth estimation threshold.
@@ -549,6 +551,10 @@ public class BitrateController
         this.forwardedEndpointIds = newForwardedEndpointIds;
     }
 
+    private void update() {
+        this.update(null, -1);
+    }
+
     /**
      * Computes the optimal and the target bitrate, limiting the target to be
      * less than bandwidth estimation specified as an argument.
@@ -698,36 +704,22 @@ public class BitrateController
                  it.hasNext() && endpointPriority < lastN;)
             {
                 Endpoint sourceEndpoint = it.next();
-                if (sourceEndpoint.isExpired()
-                    || sourceEndpoint.getID().equals(destEndpoint.getID())
+                if (sourceEndpoint.getID().equals(destEndpoint.getID())
                     || !selectedEndpoints.contains(sourceEndpoint.getID()))
                 {
                     continue;
                 }
 
-                MediaStreamTrackDesc[] tracks
-                    = sourceEndpoint.getMediaStreamTracks(MediaType.VIDEO);
-
-                if (!ArrayUtils.isNullOrEmpty(tracks))
-                {
-                    for (MediaStreamTrackDesc track : tracks)
-                    {
-                        trackBitrateAllocations.add(
-                            endpointPriority, new TrackBitrateAllocation(
-                                sourceEndpoint,
-                                track,
-                                true /* fitsInLastN */,
-                                true /* selected */,
-                                getVideoChannel().getMaxFrameHeight()));
-                    }
-
-                    endpointPriority++;
-                }
+                int count = addTracksToBitrateAllocations(trackBitrateAllocations,
+                        endpointPriority, sourceEndpoint, true /*fitsInLastN */, true /* selected */,
+                        sourceEndpoint.getMediaStreamTracks(MediaType.VIDEO));
+                endpointPriority += count;
 
                 it.remove();
             }
         }
 
+        int pinnedCount = 0;
         // Then, bubble-up the pinned endpoints.
         Set<String> pinnedEndpoints = destEndpoint.getPinnedEndpoints();
         if (!pinnedEndpoints.isEmpty())
@@ -736,31 +728,17 @@ public class BitrateController
                  it.hasNext() && endpointPriority < lastN;)
             {
                 Endpoint sourceEndpoint = it.next();
-                if (sourceEndpoint.isExpired()
-                    || sourceEndpoint.getID().equals(destEndpoint.getID())
+                if (sourceEndpoint.getID().equals(destEndpoint.getID())
                     || !pinnedEndpoints.contains(sourceEndpoint.getID()))
                 {
                     continue;
                 }
 
-                MediaStreamTrackDesc[] tracks
-                    = sourceEndpoint.getMediaStreamTracks(MediaType.VIDEO);
-
-                if (!ArrayUtils.isNullOrEmpty(tracks))
-                {
-                    for (MediaStreamTrackDesc track : tracks)
-                    {
-                        trackBitrateAllocations.add(
-                            endpointPriority, new TrackBitrateAllocation(
-                                sourceEndpoint,
-                                track,
-                                true /* fitsInLastN */,
-                                false /* selected */,
-                                getVideoChannel().getMaxFrameHeight()));
-                    }
-
-                    endpointPriority++;
-                }
+                int count = addTracksToBitrateAllocations(trackBitrateAllocations,
+                        endpointPriority, sourceEndpoint, true /*fitsInLastN */, false /* selected */,
+                        sourceEndpoint.getMediaStreamTracks(MediaType.VIDEO));
+                endpointPriority += count;
+                pinnedCount += count;
 
                 it.remove();
             }
@@ -769,37 +747,80 @@ public class BitrateController
         // Finally, deal with any remaining endpoints.
         if (!conferenceEndpoints.isEmpty())
         {
-            for (Endpoint sourceEndpoint : conferenceEndpoints)
-            {
-                if (sourceEndpoint.isExpired()
-                    || sourceEndpoint.getID().equals(destEndpoint.getID()))
+            boolean forwarded = true;
+            // If there are pinned endpoints, then we are in screenshare mode and should only
+            // send one additional client (i.e. not fill all of last-n), regardless of its aspect ratio.
+            // Special case: if LastN == 1 then always send the most active endpoint regardless of aspect ratio.
+            if (endpointPriority < lastN && (pinnedCount > 0 || lastN == 1)) {
+                Endpoint sourceEndpoint = conferenceEndpoints.remove(0);
+                if (!sourceEndpoint.getID().equals(destEndpoint.getID()))
                 {
-                    continue;
+                    endpointPriority += addTracksToBitrateAllocations(trackBitrateAllocations,
+                            endpointPriority, sourceEndpoint, true /* forwarded */, false /* selected */,
+                            sourceEndpoint.getMediaStreamTracks(MediaType.VIDEO));
+                    forwarded = false;
                 }
+            }
 
-                boolean forwarded = endpointPriority < lastN;
-
-                MediaStreamTrackDesc[] tracks
-                    = sourceEndpoint.getMediaStreamTracks(MediaType.VIDEO);
-
-                if (!ArrayUtils.isNullOrEmpty(tracks))
+            // Add up to 2 landscape endpoints
+            Map<Endpoint.AspectRatio, List<Endpoint>> endpointAspectRatios =
+                    getConferenceEndpointAspectRatios(conferenceEndpoints);
+            List<Endpoint> landscapeEndpoints = endpointAspectRatios.get(Endpoint.AspectRatio.LANDSCAPE);
+            List<Endpoint> squareEndpoints = endpointAspectRatios.get(Endpoint.AspectRatio.SQUARE);
+            int landscapeCount = 0;
+            for (List<Endpoint> endpoints: new List[]{landscapeEndpoints, squareEndpoints}) {
+                for (Endpoint sourceEndpoint : endpoints)
                 {
-                    for (MediaStreamTrackDesc track : tracks)
+                    if (sourceEndpoint.getID().equals(destEndpoint.getID()))
                     {
-                        trackBitrateAllocations.add(
-                            endpointPriority, new TrackBitrateAllocation(
-                                sourceEndpoint, track,
-                                forwarded, false /* selected */,
-                                getVideoChannel().getMaxFrameHeight()));
+                        continue;
                     }
 
-                    endpointPriority++;
+                    // Send at most 2 landscape streams
+                    forwarded &= endpointPriority < lastN
+                            && landscapeCount < 2;
+
+                    endpointPriority += addTracksToBitrateAllocations(trackBitrateAllocations,
+                            endpointPriority, sourceEndpoint, forwarded, false,
+                            sourceEndpoint.getMediaStreamTracks(MediaType.VIDEO));
+                    if (sourceEndpoint.getCameraStreamAspectRatio() == Endpoint.AspectRatio.LANDSCAPE) {
+                        landscapeCount++;
+                    }
                 }
             }
         }
 
         return trackBitrateAllocations.toArray(
             new TrackBitrateAllocation[trackBitrateAllocations.size()]);
+    }
+
+    private int addTracksToBitrateAllocations(List<TrackBitrateAllocation> trackBitrateAllocations,
+            int endpointPriority, Endpoint sourceEndpoint, boolean forwarded, boolean selected,
+            MediaStreamTrackDesc[] tracks) {
+        if (!ArrayUtils.isNullOrEmpty(tracks) && !sourceEndpoint.isExpired())
+        {
+            for (MediaStreamTrackDesc track : tracks)
+            {
+                trackBitrateAllocations.add(
+                    endpointPriority, new TrackBitrateAllocation(
+                        sourceEndpoint, track,
+                        forwarded, selected,
+                        getVideoChannel().getMaxFrameHeight()));
+            }
+            return 1;
+        }
+        return 0;
+    }
+
+    private Map<Endpoint.AspectRatio, List<Endpoint>> getConferenceEndpointAspectRatios(List<Endpoint> endpoints) {
+        Map<Endpoint.AspectRatio, List<Endpoint>> aspectRatioEndpoints = new HashMap<>();
+        for (Endpoint.AspectRatio aspectRatio: Endpoint.AspectRatio.values()) {
+            aspectRatioEndpoints.put(aspectRatio, new ArrayList<Endpoint>());
+        }
+        for (Endpoint ep: endpoints) {
+            aspectRatioEndpoints.get(ep.getCameraStreamAspectRatio()).add(ep);
+        }
+        return aspectRatioEndpoints;
     }
 
     /**
@@ -812,6 +833,45 @@ public class BitrateController
     public Collection<String> getForwardedEndpoints()
     {
         return forwardedEndpointIds;
+    }
+
+    private void onEndpointCreated(Endpoint endpoint) {
+        getVideoChannel().getEndpoint();
+        endpoint.addPropertyChangeListener(this);
+        logger.info("LastNController(" + getVideoChannel().getID() + ") Endpoint created: " + endpoint.getID());
+        List<Endpoint> newConferenceEndpoints = new ArrayList<>();
+        newConferenceEndpoints.add(endpoint);
+        update(newConferenceEndpoints, -1);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent ev) {
+        String propertyName = ev.getPropertyName();
+        if (Conference.ENDPOINTS_PROPERTY_NAME.equals(propertyName)) {
+            if (ev.getNewValue() != null) {
+                onEndpointCreated((Endpoint) ev.getNewValue());
+            }
+        }
+        else if (Endpoint.CHANNELS_PROPERTY_NAME.equals(propertyName))
+        {
+            // If a channel has been created or destroyed, it's possible the status of whether or not a
+            //  particular endpoint is sending video has changed
+            logger.warn("LastNController(" + getVideoChannel().getID() + ") Endpoint channels changed");
+            update();
+        }
+        else if (VideoChannel.VIDEOCHANNEL_DIRECTION.equals(propertyName))
+        {
+            // If a video channel's direction has changed, it's possible the status of whether or not a
+            //  particular endpoint is sending video has changed
+            logger.warn("LastNController(" + getVideoChannel().getID() + ") channel direction changed");
+            update();
+        }
+        else if (Endpoint.STREAM_ASPECT_RATIO_CHANGE_PROPERTY_NAME.equals(propertyName))
+        {
+            // If an endpoint's streams' aspect ratio changes, the last N list may be changed
+            logger.warn("LastNController(" + getVideoChannel().getID() + ") Endpoint aspect ratio changed");
+            update();
+        }
     }
 
     /**

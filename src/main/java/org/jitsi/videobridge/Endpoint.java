@@ -38,6 +38,16 @@ public class Endpoint
     extends PropertyChangeNotifier
     implements WebRtcDataStream.DataCallback
 {
+
+    public static enum AspectRatio {
+        SQUARE,
+        LANDSCAPE,
+        NONE
+    }
+    // Corresponds to values in VideobridgeRest in fatline
+    public static String ASPECT_RATIO_SQUARE = "square";
+    public static String ASPECT_RATIO_LANDSACPE = "landsacpe";
+
     /**
      * The name of the <tt>Endpoint</tt> property <tt>channels</tt> which lists
      * the <tt>RtpChannel</tt>s associated with the <tt>Endpoint</tt>.
@@ -51,6 +61,9 @@ public class Endpoint
      */
     public static final String STREAM_ASPECT_RATIO_CHANGE_PROPERTY_NAME
         = Endpoint.class.getName() + " .aspectRatio";
+
+    //TEMP(brian): hard-code to square for now
+    private AspectRatio cameraStreamAspectRatio = AspectRatio.NONE;
 
     /**
      * The {@link Logger} used by the {@link Endpoint} class to print debug
@@ -707,5 +720,27 @@ public class Endpoint
         }
 
         return null;
+    }
+
+    public void setCameraStreamWidthHeight(int width, int height)
+    {
+        // NOTE(brian): we use to dynamically determine the aspect ratio here, but the bridge
+        //  didn't know the difference between the screenshare stream and a camera stream, so
+        //  the detection could get confused.  i'm still leaving this method here though (and
+        //  the logic hooked up to it), because it's not doing any harm and we have talked about
+        //  clients being able to express a max resolution they want to receive, so this logic
+        //  may still be useful
+    }
+
+    public void setCameraStreamAspectRatio(AspectRatio ratio)
+    {
+        logger.info("Setting the aspect ratio to " + ratio + " for endpoint " + this.id);
+        this.cameraStreamAspectRatio = ratio;
+        firePropertyChange(STREAM_ASPECT_RATIO_CHANGE_PROPERTY_NAME, null, null);
+    }
+
+    public AspectRatio getCameraStreamAspectRatio()
+    {
+        return this.cameraStreamAspectRatio;
     }
 }

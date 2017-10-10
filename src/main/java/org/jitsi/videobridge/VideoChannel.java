@@ -227,6 +227,8 @@ public class VideoChannel
      */
     private int lastN = -1;
 
+    public static final String VIDEOCHANNEL_DIRECTION
+            = "org.jitsi.videobridge.VideoChannel.direction";
     /**
      * Initializes a new <tt>VideoChannel</tt> instance which is to have a
      * specific ID. The initialization is to be considered requested by a
@@ -887,6 +889,14 @@ public class VideoChannel
     public int getMaxFrameHeight()
     {
         return this.maxFrameHeight;
+    }
+
+    @Override
+    public void setDirection(MediaDirection direction)
+    {
+        MediaDirection oldDirection = getStream().getDirection();
+        super.setDirection(direction);
+        firePropertyChange(VIDEOCHANNEL_DIRECTION, oldDirection, direction);
     }
 
     /**

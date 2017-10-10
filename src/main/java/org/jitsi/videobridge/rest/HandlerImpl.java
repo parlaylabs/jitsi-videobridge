@@ -207,7 +207,7 @@ class HandlerImpl
     /**
      * The logger instance used by REST handler.
      */
-    protected static final Logger logger = Logger.getLogger(HandlerImpl.class);
+    protected static final Logger logger = Logger.getLogger(HighfiveHandlerImpl.class);
 
     /**
      * The HTTP resource which is used to trigger graceful shutdown.
@@ -707,7 +707,6 @@ class HandlerImpl
         throws IOException,
                ServletException
     {
-System.out.println("Creating conference");
         Videobridge videobridge = getVideobridge();
 
         if (videobridge == null)
@@ -716,7 +715,6 @@ System.out.println("Creating conference");
         }
         else if (RESTUtil.isJSONContentType(request.getContentType()))
         {
-System.out.println("Is Json");
             Object requestJSONObject = null;
             int status = 0;
 
@@ -745,7 +743,6 @@ System.out.println("Is Json");
             }
             if (status == 0)
             {
-System.out.println("Is status 0");
                 ColibriConferenceIQ requestConferenceIQ
                     = JSONDeserializer.deserializeConference(
                             (JSONObject) requestJSONObject);
@@ -757,7 +754,6 @@ System.out.println("Is status 0");
                 }
                 else
                 {
-System.out.println("Is valid rciq");
                     ColibriConferenceIQ responseConferenceIQ = null;
 
                     try
@@ -769,7 +765,6 @@ System.out.println("Is valid rciq");
 
                         if (responseIQ instanceof ColibriConferenceIQ)
                         {
-System.out.println("Is valid cciq");
                             responseConferenceIQ
                                 = (ColibriConferenceIQ) responseIQ;
                         }
@@ -790,19 +785,14 @@ System.out.println("Is valid cciq");
                     catch (Exception e)
                     {
                         status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-e.printStackTrace();
                     }
                     if (status == 0 && responseConferenceIQ != null)
                     {
-System.out.println("Is valid json");
                         JSONObject responseJSONObject
                             = JSONSerializer.serializeConference(
                                     responseConferenceIQ);
-System.out.println("Is valid json 2");
                         if (responseJSONObject == null)
                             responseJSONObject = new JSONObject();
-System.out.println("Is valid json 3");
-System.out.println(responseJSONObject.toJSONString());
                         response.setStatus(HttpServletResponse.SC_OK);
                         responseJSONObject.writeJSONString(
                                 response.getWriter());

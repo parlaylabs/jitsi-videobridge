@@ -59,15 +59,15 @@ public class HighfiveHandlerImpl extends HandlerImpl {
                 return;
             }
 
-//            if (aspectRatio.equals(Endpoint.ASPECT_RATIO_SQUARE))
-//            {
-//
-//                endpoint.setCameraStreamAspectRatio(Endpoint.AspectRatio.SQUARE);
-//            }
-//            else if (aspectRatio.equals(Endpoint.ASPECT_RATIO_LANDSACPE))
-//            {
-//                endpoint.setCameraStreamAspectRatio(Endpoint.AspectRatio.LANDSCAPE);
-//            }
+            if (aspectRatio.equals(Endpoint.ASPECT_RATIO_SQUARE))
+            {
+
+                endpoint.setCameraStreamAspectRatio(Endpoint.AspectRatio.SQUARE);
+            }
+            else if (aspectRatio.equals(Endpoint.ASPECT_RATIO_LANDSACPE))
+            {
+                endpoint.setCameraStreamAspectRatio(Endpoint.AspectRatio.LANDSCAPE);
+            }
             else
             {
                 logger.error("Can't set aspect ratio for endpoint " + endpointId + " to " + aspectRatio);

@@ -114,7 +114,7 @@ public class RESTBundleActivator
             Server server)
     {
         return
-            new HandlerImpl(
+            new HighfiveHandlerImpl(
                     bundleContext,
                     getCfgBoolean(ENABLE_REST_SHUTDOWN_PNAME, false),
                     getCfgBoolean(ENABLE_REST_COLIBRI_PNAME, true));

@@ -263,6 +263,7 @@ public class BitrateController
      * The current padding parameters list for {@link #dest}.
      */
     private List<SimulcastController> simulcastControllers;
+    private boolean hasReceivedFirstPacket = false;
 
     /**
      * Initializes a new {@link BitrateController} instance which is to
@@ -356,6 +357,11 @@ public class BitrateController
             return false;
         }
 
+        if (!this.hasReceivedFirstPacket) {
+            this.hasReceivedFirstPacket = true;
+            update();
+        }
+
         SimulcastController simulcastController
             = ssrcToBitrateController.get(ssrc);
 
@@ -378,6 +384,9 @@ public class BitrateController
      */
     public void update(List<Endpoint> conferenceEndpoints, long bweBps)
     {
+        if (!hasReceivedFirstPacket) {
+            return;
+        }
         if (bweBps > -1)
         {
             if (!isLargerThanBweThreshold(lastBwe, bweBps))

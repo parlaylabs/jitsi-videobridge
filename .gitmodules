@@ -1,0 +1,4 @@
+[submodule "libjitsi"]
+	path = libjitsi
+	url = git@github.com:parlaylabs/fatline-libjitsi.git
+	branch = origin
